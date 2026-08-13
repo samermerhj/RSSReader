@@ -2,6 +2,7 @@
 #define RESOURCEMANAGER_H
 
 #include <QString>
+
 /**
  * Copyright (C) 2026 Samer Merhj <mjosak7@gmail.com>
  *
@@ -22,9 +23,12 @@
 class ResourceManager
 {
 public:
-    static QString getResourcesPath();
-    static QString getTranslationsPath();
-    static QString getCachePath();
+    static QString getBasePath();               // ~/rsss/
+    static QString getResourcesPath();          // ~/rsss/resources/
+    static QString getWritableResourcesPath();  // ~/rsss/resources/ (نفسه)
+    static QString getTranslationsPath();       // ~/rsss/translations/
+    static QString getCachePath();              // ~/rsss/cache/
+    static QString getDataPath();               // ~/rsss/ (لقاعدة البيانات)
 };
 
 #endif // RESOURCEMANAGER_H

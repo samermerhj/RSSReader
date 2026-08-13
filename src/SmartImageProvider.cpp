@@ -49,7 +49,7 @@ SmartImageProvider::SmartImageProvider(QObject *parent) : QObject(parent)
 // 🔥 تم التعديل لاستخدام ResourceManager
 QString SmartImageProvider::resourcesPath()
 {
-    return ResourceManager::getResourcesPath() + "/";
+    return ResourceManager::getWritableResourcesPath() + "/";
 }
 
 void SmartImageProvider::loadMappingsFromJson()

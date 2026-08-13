@@ -2,6 +2,7 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QStandardPaths>
+#include <QDebug>
 
 /**
  * Copyright (C) 2026 Samer Merhj <mjosak7@gmail.com>
@@ -19,41 +20,33 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
- 
+
+QString ResourceManager::getBasePath()
+{
+    return QDir::homePath() + "/rsss";
+}
+
 QString ResourceManager::getResourcesPath()
 {
-    // 1. أثناء التطوير (من مجلد البناء)
-    QString devPath = QCoreApplication::applicationDirPath() + "/resources";
-    if (QDir(devPath).exists())
-        return devPath;
+    return getBasePath() + "/resources";
+}
 
-    // 2. أثناء التثبيت (عبر .deb)
-    QString installPath = "/usr/share/RSSReader/resources";
-    if (QDir(installPath).exists())
-        return installPath;
-
-    // 3. مسار احتياطي
-    return devPath; // أو يمكنك إرجاع QString()
+QString ResourceManager::getWritableResourcesPath()
+{
+    return getResourcesPath();  // نفس المسار
 }
 
 QString ResourceManager::getTranslationsPath()
 {
-    QString devPath = QCoreApplication::applicationDirPath() + "/translations";
-    if (QDir(devPath).exists())
-        return devPath;
-
-    QString installPath = "/usr/share/RSSReader/translations";
-    if (QDir(installPath).exists())
-        return installPath;
-
-    return devPath;
+    return getBasePath() + "/translations";
 }
 
 QString ResourceManager::getCachePath()
 {
-    // استخدام المسار المخصص للتطبيق في مجلد المستخدم
-    QString cacheDir = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
-    if (cacheDir.isEmpty())
-        cacheDir = QCoreApplication::applicationDirPath() + "/cache";
-    return cacheDir;
+    return getBasePath() + "/cache";
+}
+
+QString ResourceManager::getDataPath()
+{
+    return getBasePath();
 }

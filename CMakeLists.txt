@@ -67,6 +67,22 @@ install(FILES rssreader.desktop DESTINATION share/applications)
 # تثبيت الرخصة
 install(FILES LICENSE DESTINATION share/doc/RSSReader)
 
+# ---------- إنشاء مجلد rsss في منزل المستخدم ونسخ الملفات إليه أثناء التثبيت ----------
+install(CODE "
+    # الحصول على اسم المستخدم
+    execute_process(COMMAND whoami OUTPUT_VARIABLE USERNAME OUTPUT_STRIP_TRAILING_WHITESPACE)
+    # مسار المجلد الجديد
+    set(RSSS_DIR \"/home/\${USERNAME}/rsss\")
+    # إنشاء المجلدات
+    file(MAKE_DIRECTORY \${RSSS_DIR}/resources/images/news_icons)
+    file(MAKE_DIRECTORY \${RSSS_DIR}/resources/images/backgrounds)
+    file(MAKE_DIRECTORY \${RSSS_DIR}/translations)
+    file(MAKE_DIRECTORY \${RSSS_DIR}/cache/images)
+    # نسخ الملفات من مجلد التثبيت إلى rsss
+    file(COPY ${CMAKE_SOURCE_DIR}/resources/ DESTINATION \${RSSS_DIR}/resources/)
+    file(COPY ${CMAKE_SOURCE_DIR}/translations/ DESTINATION \${RSSS_DIR}/translations/)
+")
+
 # ---------- إعدادات CPack لإنشاء حزمة .deb ----------
 set(CPACK_GENERATOR "DEB")
 set(CPACK_PACKAGE_NAME "rssreader")

@@ -1,4 +1,5 @@
 #include "DatabaseManager.h"
+#include "ResourceManager.h"
 #include <QDebug>
 #include <QDir>
 #include <QDateTime>
@@ -21,8 +22,10 @@
 DatabaseManager::DatabaseManager(const QString &dbPath, QObject *parent)
     : QObject(parent)
 {
+    // تجاهل dbPath الوارد واستخدم المسار الموحد
+    QString effectivePath = ResourceManager::getDataPath() + "/rss_archive.db";
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(dbPath);
+    db.setDatabaseName(effectivePath);
     if (!db.open()) {
         qWarning() << "فشل فتح قاعدة البيانات:" << db.lastError().text();
         return;

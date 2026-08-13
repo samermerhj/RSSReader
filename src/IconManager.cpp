@@ -44,7 +44,7 @@ IconManager::IconManager(QObject *parent) : QObject(parent)
 // 🔥 تم التعديل لاستخدام ResourceManager
 void IconManager::loadKeywordsFromJSON()
 {
-    QString jsonPath = ResourceManager::getResourcesPath() + "/icon_mappings.json";
+    QString jsonPath = ResourceManager::getWritableResourcesPath() + "/icon_mappings.json";
     QFile file(jsonPath);
     if (!file.open(QIODevice::ReadOnly)) { loadDefaultKeywords(); return; }
 
