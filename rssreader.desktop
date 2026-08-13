@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=RSS Reader
+Name[ar]=قارئ RSS
+Comment=Advanced Electronic Newspaper
+Comment[ar]=جريدة إلكترونية متطورة
+Exec=/usr/bin/RSSReader_Qt
+Icon=/usr/share/icons/hicolor/scalable/apps/rssreader.svg
+Terminal=false
+Type=Application
+Categories=Network;News;Qt;
+StartupNotify=true

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/icon_mappings.json</file>
+    </qresource>
+</RCC>

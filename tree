@@ -1,0 +1,33 @@
+RSSReader_Qt/
+├── src/
+│   ├── main.cpp
+│   ├── IconManager.h
+│   ├── IconManager.cpp
+│   ├── ImageDatabase.h
+│   ├── ImageDatabase.cpp
+│   ├── MainWindow.h
+│   ├── MainWindow.cpp
+│   ├── DatabaseManager.h
+│   ├── DatabaseManager.cpp
+│   ├── RSSFetcher.h
+│   ├── RSSFetcher.cpp
+│   ├── NewsTicker.h
+│   ├── NewsTicker.cpp
+│   ├── MagazinePage.h
+│   ├── MagazinePage.cpp
+│   ├── SettingsDialog.h
+│   ├── SettingsDialog.cpp
+│   ├── SmartImageProvider.h
+│   └── SmartImageProvider.cpp
+├── CMakeLists.txt
+└── resources/
+      ├── images/news_icons
+      │                 ├── politics.svg          # أيقونة السياسة
+      │                 ├── sports.svg            # أيقونة الرياضة
+      │                 ├── health.svg            # أيقونة الصحة
+      │                 ├── economy.svg           # أيقونة الاقتصاد
+      │                 ├── technology.svg        # أيقونة التكنولوجيا
+      │                 ├──  ......
+      │
+      │
+      └── icon_mappings.json

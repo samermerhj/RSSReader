@@ -1,0 +1,66 @@
+[
+    {
+        "icon": "war",
+        "category": "military",
+        "languages": {
+            "ar": { "keywords": ["حرب", "قصف", "جيش", "طائرة", "صاروخ", "عسكري", "قوات", "معركة"], "learned": [], "weight": 1.0 },
+            "en": { "keywords": ["war", "bombing", "army", "missile", "military"], "learned": [], "weight": 1.0 }
+        }
+    },
+    {
+        "icon": "football",
+        "category": "sports",
+        "languages": {
+            "ar": { "keywords": ["كرة", "مباراة", "فيفا", "كأس", "دوري", "ملعب", "هدف"], "learned": [], "weight": 1.0 },
+            "en": { "keywords": ["football", "soccer", "match", "fifa", "cup", "league", "goal"], "learned": [], "weight": 1.0 }
+        }
+    },
+    {
+        "icon": "politics",
+        "category": "politics",
+        "languages": {
+            "ar": { "keywords": ["سياسة", "حكومة", "وزير", "برلمان", "انتخابات", "رئيس"], "learned": [], "weight": 1.0 },
+            "en": { "keywords": ["politics", "government", "minister", "parliament", "election"], "learned": [], "weight": 1.0 }
+        }
+    },
+    {
+        "icon": "health",
+        "category": "health",
+        "languages": {
+            "ar": { "keywords": ["صحة", "مستشفى", "دواء", "فيروس", "وباء", "طبيب"], "learned": [], "weight": 1.0 },
+            "en": { "keywords": ["health", "hospital", "medicine", "virus", "epidemic"], "learned": [], "weight": 1.0 }
+        }
+    },
+    {
+        "icon": "economy",
+        "category": "economy",
+        "languages": {
+            "ar": { "keywords": ["اقتصاد", "بورصة", "دولار", "سوق", "أرباح", "مال"], "learned": [], "weight": 1.0 },
+            "en": { "keywords": ["economy", "stock", "dollar", "market", "profit", "money"], "learned": [], "weight": 1.0 }
+        }
+    },
+    {
+        "icon": "tech",
+        "category": "tech",
+        "languages": {
+            "ar": { "keywords": ["تكنولوجيا", "ذكاء", "حاسوب", "هاتف", "برمجة", "تقنية"], "learned": [], "weight": 1.0 },
+            "en": { "keywords": ["technology", "tech", "computer", "phone", "software"], "learned": [], "weight": 1.0 }
+        }
+    },
+    {
+        "icon": "environment",
+        "category": "environment",
+        "languages": {
+            "ar": { "keywords": ["بيئة", "مناخ", "طبيعة", "غابات", "بحر", "تلوث"], "learned": [], "weight": 1.0 },
+            "en": { "keywords": ["environment", "climate", "nature", "forest", "ocean", "pollution"], "learned": [], "weight": 1.0 }
+        }
+    },
+    {
+        "icon": "culture",
+        "category": "culture",
+        "languages": {
+            "ar": { "keywords": ["ثقافة", "فن", "كتاب", "سينما", "موسيقى", "مسرح"], "learned": [], "weight": 1.0 },
+            "en": { "keywords": ["culture", "art", "book", "cinema", "music", "theater"], "learned": [], "weight": 1.0 }
+        }
+    }
+]
