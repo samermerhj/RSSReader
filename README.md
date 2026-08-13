@@ -73,6 +73,7 @@ Professional features will come later..
   <em>Magazine Mode – News Cards Display</em>
 </div>
 
+
 ## 📥 Download
 
 **Version:** `1.0.0`
