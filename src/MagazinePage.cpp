@@ -1,5 +1,6 @@
 #include "MagazinePage.h"
 #include "SmartImageProvider.h"
+#include "ResourceManager.h"  // 🔥 تمت الإضافة
 #include <QGridLayout>
 #include <QLabel>
 #include <QFrame>
@@ -28,6 +29,7 @@
 #include <QSharedPointer>
 #include <QPair>
 #include <QRegularExpression>
+
 /**
  * Copyright (C) 2026 Samer Merhj <mjosak7@gmail.com>
  *
@@ -44,6 +46,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 static QString getCategoryColor(const QString &category)
 {
     static QMap<QString, QString> colors = {
@@ -322,18 +325,18 @@ void MagazinePage::createCard(const NewsItem &item, int row, int col)
             btn->setText(tr(altCat.toUtf8().constData()));
 
             connect(btn, &QPushButton::clicked, this, [this, item, altCat, imageLabel, categoryLabel, altBar, langCode]() {
-    // 1. تعلم من التصحيح
+                // 1. تعلم من التصحيح
                 SmartImageProvider::instance()->learnFromNews(item, altCat, langCode);
 
-    // 2. ✅ أعد تحميل IconManager من الملف المُحدّث
+                // 2. ✅ أعد تحميل IconManager من الملف المُحدّث
                 IconManager::instance()->loadKeywordsFromJSON();
 
-    // 3. أعد توليد الصورة بالتصنيف الجديد
+                // 3. أعد توليد الصورة بالتصنيف الجديد
                 QPixmap newImage = SmartImageProvider::instance()->getImageForNews(item, 400, 200, langCode);
                 imageLabel->setPixmap(newImage);
                 imageLabel->repaint();
 
-    // 4. تحديث النص واللون
+                // 4. تحديث النص واللون
                 categoryLabel->setText(tr(altCat.toUtf8().constData()));
                 categoryLabel->setStyleSheet(QString(R"(
                     QLabel {
@@ -343,16 +346,15 @@ void MagazinePage::createCard(const NewsItem &item, int row, int col)
                     }
                 )").arg(getCategoryColor(altCat)));
 
-    // 5. إخفاء الأزرار
+                // 5. إخفاء الأزرار
                 altBar->deleteLater();
             });
-
 
             altLayout->addWidget(btn);
         }
         altLayout->addStretch(); // يدفع الأزرار للأسفل
 
-    // وضع الشريط على يمين الصورة
+        // وضع الشريط على يمين الصورة
         altBar->setParent(imageLabel);
         altBar->setGeometry(imageLabel->width() - 110, 0, 110, 200);
         altBar->show();
@@ -425,6 +427,7 @@ void MagazinePage::updateLoadingStatus()
     }
 }
 
+// 🔥 تم التعديل لاستخدام ResourceManager للكاش
 bool MagazinePage::loadImageFromCache(const QString &url, QLabel *targetLabel)
 {
     QString key = getCacheKey(url);
@@ -436,7 +439,11 @@ bool MagazinePage::loadImageFromCache(const QString &url, QLabel *targetLabel)
         targetLabel->setText("");
         return true;
     }
-    QString filePath = QString("cache/images/%1.jpg").arg(key);
+    
+    // استخدام ResourceManager للحصول على مسار الكاش الصحيح
+    QString cachePath = ResourceManager::getCachePath() + "/images/";
+    QString filePath = cachePath + key + ".jpg";
+    
     if (QFile::exists(filePath)) {
         QPixmap pixmap;
         if (pixmap.load(filePath)) {
@@ -453,6 +460,7 @@ bool MagazinePage::loadImageFromCache(const QString &url, QLabel *targetLabel)
     return false;
 }
 
+// 🔥 تم التعديل لاستخدام ResourceManager للكاش
 void MagazinePage::saveImageToCache(const QString &url, const QByteArray &data)
 {
     QString key = getCacheKey(url);
@@ -461,11 +469,19 @@ void MagazinePage::saveImageToCache(const QString &url, const QByteArray &data)
         int imageSize = pixmap->width() * pixmap->height() * (pixmap->depth() / 8);
         imageCache.insert(key, pixmap, imageSize);
     }
-    QDir cacheDir("cache/images");
-    if (!cacheDir.exists()) cacheDir.mkpath(".");
+    
+    // استخدام ResourceManager للحصول على مسار الكاش الصحيح
+    QString cachePath = ResourceManager::getCachePath() + "/images/";
+    QDir cacheDir(cachePath);
+    if (!cacheDir.exists()) {
+        cacheDir.mkpath(".");
+    }
     QString filePath = cacheDir.filePath(key + ".jpg");
     QFile file(filePath);
-    if (file.open(QIODevice::WriteOnly)) { file.write(data); file.close(); }
+    if (file.open(QIODevice::WriteOnly)) {
+        file.write(data);
+        file.close();
+    }
 }
 
 QString MagazinePage::getCacheKey(const QString &url) const

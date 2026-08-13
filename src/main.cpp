@@ -7,6 +7,8 @@
 #include <QSettings>
 #include <QMessageBox>
 #include "MainWindow.h"
+#include "ResourceManager.h"  // 🔥 تمت الإضافة
+
 /**
  * Copyright (C) 2026 Samer Merhj <mjosak7@gmail.com>
  *
@@ -46,9 +48,12 @@ int main(int argc, char *argv[])
     QTranslator appTranslator;
     bool translationLoaded = false;
 
+    // 🔥 الحصول على مسار الترجمات من ResourceManager
+    QString transPath = ResourceManager::getTranslationsPath();
+
     // محاولة تحميل الترجمة بناءً على اللغة
-    QString translationFile = QString(":/translations/RSSReader_%1").arg(lang);
-    QString translationFileShort = QString(":/translations/RSSReader_%1").arg(langCode);
+    QString translationFile = transPath + "/RSSReader_" + lang;
+    QString translationFileShort = transPath + "/RSSReader_" + langCode;
 
     // محاولة تحميل الملف الكامل (مثل RSSReader_ar_SA) أولاً، ثم الملف المختصر (RSSReader_ar)
     if (appTranslator.load(translationFile) || appTranslator.load(translationFileShort)) {
@@ -57,12 +62,13 @@ int main(int argc, char *argv[])
         qDebug() << "✅ تم تحميل الترجمة للغة:" << lang;
     } else {
         // محاولة تحميل اللغة الإنجليزية كحل احتياطي
-        if (appTranslator.load(":/translations/RSSReader_en")) {
+        QString enFile = transPath + "/RSSReader_en";
+        if (appTranslator.load(enFile)) {
             app.installTranslator(&appTranslator);
             translationLoaded = true;
             qDebug() << "✅ تم تحميل الترجمة الإنجليزية (احتياطي).";
         } else {
-            qWarning() << "⚠️ فشل تحميل أي ترجمة. استخدام النصوص المضمنة.";
+            qWarning() << "⚠️ فشل تحميل أي ترجمة من:" << transPath;
         }
     }
 
@@ -74,11 +80,12 @@ int main(int argc, char *argv[])
     QString qtTranslationFile = QString("qt_%1").arg(lang);
     QString qtTranslationFileShort = QString("qt_%1").arg(langCode);
 
+    // نبحث في مسار النظام أولاً، ثم في مجلد الترجمات الخاص بنا
     if (!qtTranslationsPath.isEmpty()) {
         if (qtTranslator.load(qtTranslationFile, qtTranslationsPath) ||
             qtTranslator.load(qtTranslationFileShort, qtTranslationsPath) ||
-            qtTranslator.load(qtTranslationFile, ":/translations") ||
-            qtTranslator.load(qtTranslationFileShort, ":/translations")) {
+            qtTranslator.load(qtTranslationFile, transPath) ||
+            qtTranslator.load(qtTranslationFileShort, transPath)) {
             app.installTranslator(&qtTranslator);
             qDebug() << "✅ تم تحميل ترجمة Qt للغة:" << lang;
         } else {

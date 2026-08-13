@@ -1,8 +1,8 @@
-  [Desktop Entry]
-  Type=Application
-  Name=RSSReader
-  Comment=Smart News Magazine
-  Exec=rssreader-qt
-  Icon=rssreader
-  Terminal=false
-  Categories=Utility;Network;
+[Desktop Entry]
+Type=Application
+Name=RSSReader
+Comment=Smart News Magazine
+Exec=rssreader
+Icon=rssreader
+Terminal=false
+Categories=Utility;Network;

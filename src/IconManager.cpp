@@ -1,5 +1,6 @@
 #include "SmartImageProvider.h"
 #include "IconManager.h"
+#include "ResourceManager.h"  // 🔥 تمت الإضافة
 #include <QPainter>
 #include <QDebug>
 #include <QJsonDocument>
@@ -8,6 +9,7 @@
 #include <QFile>
 #include <QCoreApplication>
 #include <QRegularExpression>
+
 /**
  * Copyright (C) 2026 Samer Merhj <mjosak7@gmail.com>
  *
@@ -24,6 +26,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 IconManager* IconManager::m_instance = nullptr;
 
 IconManager* IconManager::instance()
@@ -38,10 +41,10 @@ IconManager::IconManager(QObject *parent) : QObject(parent)
     loadIcons();
 }
 
-// ---------- قراءة البنية الجديدة (languages) ----------
+// 🔥 تم التعديل لاستخدام ResourceManager
 void IconManager::loadKeywordsFromJSON()
 {
-    QString jsonPath = SmartImageProvider::resourcesPath() + "icon_mappings.json";
+    QString jsonPath = ResourceManager::getResourcesPath() + "/icon_mappings.json";
     QFile file(jsonPath);
     if (!file.open(QIODevice::ReadOnly)) { loadDefaultKeywords(); return; }
 

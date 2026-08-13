@@ -91,7 +91,7 @@ MainWindow::MainWindow(QWidget *parent)
     updateSourceCombo();
 
     // ---------- أيقونة التطبيق وعلبة النظام ----------
-    QIcon appIcon(":/icons/tray_icon.png");  // تأكد من وجود الملف icons/tray_icon.png
+    QIcon appIcon(":/icons/tray_icon.svg");  // تأكد من وجود الملف icons/tray_icon.png
     setWindowIcon(appIcon);
     QApplication::setWindowIcon(appIcon);
     trayIcon = new QSystemTrayIcon(appIcon, this);

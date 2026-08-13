@@ -1,5 +1,6 @@
 #include "SmartImageProvider.h"
 #include "IconManager.h"
+#include "ResourceManager.h"  // 🔥 تمت الإضافة
 #include <QPainter>
 #include <QSvgRenderer>
 #include <QDir>
@@ -13,6 +14,7 @@
 #include <QPainterPath>
 #include <QRandomGenerator>
 #include <QRegularExpression>
+
 /**
  * Copyright (C) 2026 Samer Merhj <mjosak7@gmail.com>
  *
@@ -29,6 +31,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 SmartImageProvider* SmartImageProvider::m_instance = nullptr;
 
 SmartImageProvider* SmartImageProvider::instance()
@@ -43,17 +46,10 @@ SmartImageProvider::SmartImageProvider(QObject *parent) : QObject(parent)
     loadMappingsFromJson();
 }
 
+// 🔥 تم التعديل لاستخدام ResourceManager
 QString SmartImageProvider::resourcesPath()
 {
-    QString path = QCoreApplication::applicationDirPath() + "/resources/";
-    if (QDir(path).exists()) return path;
-    path = "/usr/share/RSSReader/resources/";
-    if (QDir(path).exists()) return path;
-    path = QDir::homePath() + "/.local/share/RSSReader/resources/";
-    if (QDir(path).exists()) return path;
-    QString fallback = QCoreApplication::applicationDirPath() + "/resources/";
-    qWarning() << "⚠️ resourcesPath: لم يتم العثور على مجلد resources، سيتم استخدام المسار الاحتياطي:" << fallback;
-    return fallback;
+    return ResourceManager::getResourcesPath() + "/";
 }
 
 void SmartImageProvider::loadMappingsFromJson()
@@ -62,10 +58,8 @@ void SmartImageProvider::loadMappingsFromJson()
     QString jsonPath = resourcesPath() + "icon_mappings.json";
     QFile file(jsonPath);
     if (file.open(QIODevice::ReadOnly)) { data = file.readAll(); file.close(); loaded = true; }
-    if (!loaded) {
-        QFile resourceFile(":/resources/icon_mappings.json");
-        if (resourceFile.open(QIODevice::ReadOnly)) { data = resourceFile.readAll(); resourceFile.close(); loaded = true; }
-    }
+    
+    // 🔥 تم إزالة البحث عن ":/resources/" لأننا لم نعد نستخدم الموارد المضمنة
     if (!loaded) {
         qWarning() << "SmartImageProvider: لم يتم العثور على icon_mappings.json. سيتم استخدام قائمة افتراضية.";
         // القائمة الافتراضية القديمة لا تزال تعمل كحالة طوارئ
@@ -139,20 +133,9 @@ QStringList SmartImageProvider::getTopIcons(const QString &text, int maxCount) c
     return topIcons;
 }
 
+// 🔥 تم إزالة البحث عن ":/resources/" نهائياً
 bool SmartImageProvider::tryLoadSvg(const QString &iconName, QPixmap &outPixmap, int width, int height) const
 {
-    QString resourcePath = ":/resources/images/news_icons/" + iconName + ".svg";
-    if (QFile::exists(resourcePath)) {
-        QSvgRenderer renderer(resourcePath);
-        if (renderer.isValid()) {
-            outPixmap = QPixmap(width, height);
-            outPixmap.fill(Qt::transparent);
-            QPainter painter(&outPixmap);
-            renderer.render(&painter);
-            painter.end();
-            return true;
-        }
-    }
     QString filePath = SmartImageProvider::resourcesPath() + "images/news_icons/" + iconName + ".svg";
     if (QFile::exists(filePath)) {
         QSvgRenderer renderer(filePath);
@@ -168,6 +151,7 @@ bool SmartImageProvider::tryLoadSvg(const QString &iconName, QPixmap &outPixmap,
     return false;
 }
 
+// 🔥 تم إزالة البحث عن ":/resources/" نهائياً
 bool SmartImageProvider::loadBackgroundSvg(const QString &category, QPixmap &outPixmap, int width, int height) const
 {
     QMap<QString, QString> bgFiles = {
@@ -176,18 +160,6 @@ bool SmartImageProvider::loadBackgroundSvg(const QString &category, QPixmap &out
         {"environment", "environment"}, {"culture", "culture"}
     };
     QString fileName = bgFiles.value(category, "default");
-    QString resourcePath = ":/resources/images/backgrounds/" + fileName + ".svg";
-    if (QFile::exists(resourcePath)) {
-        QSvgRenderer renderer(resourcePath);
-        if (renderer.isValid()) {
-            outPixmap = QPixmap(width, height);
-            outPixmap.fill(Qt::transparent);
-            QPainter painter(&outPixmap);
-            renderer.render(&painter);
-            painter.end();
-            return true;
-        }
-    }
     QString filePath = SmartImageProvider::resourcesPath() + "images/backgrounds/" + fileName + ".svg";
     if (QFile::exists(filePath)) {
         QSvgRenderer renderer(filePath);
