@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-windows:
-    runs-on: windows-2022  
+    runs-on: windows-2022
 
     steps:
     - name: Checkout source code
@@ -41,8 +41,31 @@ jobs:
         windeployqt.exe rssreader.exe
       shell: bash
 
+    - name: Copy resources and translations
+      run: |
+        cd build
+        cp -r ../resources .
+        cp -r ../translations .
+      shell: bash
+
     - name: Upload Deployed Folder
       uses: actions/upload-artifact@v4
       with:
         name: windows-deployed
         path: build/
+  
+    - name: Install NSIS (makensis)
+      run: |
+        choco install nsis
+      shell: powershell
+
+    - name: Build Installer
+      run: |
+        makensis installer.nsi
+      shell: cmd
+
+    - name: Upload Installer
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-installer
+        path: RSSReader_Setup.exe
