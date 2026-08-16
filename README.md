@@ -4,7 +4,7 @@
 [![Qt Version](https://img.shields.io/badge/Qt-5.15+-green.svg)](https://www.qt.io/)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows-lightgrey.svg)](https://github.com/samermerhj/RSSReader)
 [![Version](https://img.shields.io/badge/Version-1.0.0-orange.svg)](https://github.com/samermerhj/RSSReader/releases)
-  
+
 ## 💡 The Story
 
 In a place you've never heard of, time stood still.
@@ -25,8 +25,7 @@ Now, that intention has become **Smart RSS**; a smart, powerful, and vibrant new
 **This is code worth trying.** 🚀
 
 I'm sharing the first version of this code as free software, under a strong license that protects my work and respects my effort.
-Professional features will come later..
-
+Professional features will come later.
 
 ## ✨ Features (Free Version)
 
@@ -52,7 +51,7 @@ Professional features will come later..
 - 🎨 Custom themes and icons.
 - 📄 Print newspaper support.
 - 📧 Early access to updates.
-- 📧 Animated magazine images.
+- 🖼️ Animated magazine images.
 - 📧 Text-to-speech for news.
 
 **Built with Qt/C++. Lightweight. No bloat.**
@@ -60,7 +59,7 @@ Professional features will come later..
 ## 📸 Screenshots
 
 <div align="center">
-  <img src="docs/screenshot1.jpg" alt="Main Interface" width="800"/>
+  <img src="https://raw.githubusercontent.com/samermerhj/RSSReader/main/docs/screenshot1.jpg" alt="Main Interface" width="700"/>
   <br/>
   <em>Main Interface – News Display</em>
 </div>
@@ -68,11 +67,10 @@ Professional features will come later..
 <br/>
 
 <div align="center">
-  <img src="docs/screenshot2.jpg" alt="Magazine Mode" width="800"/>
+  <img src="https://raw.githubusercontent.com/samermerhj/RSSReader/main/docs/screenshot2.jpg" alt="Magazine Mode" width="700"/>
   <br/>
   <em>Magazine Mode – News Cards Display</em>
 </div>
-
 
 ## 📥 Download
 
@@ -82,117 +80,187 @@ Professional features will come later..
 
 | Platform | File | Link |
 | :--- | :--- | :--- |
-| **Linux (.deb)** | `rssreader-qt_1.0.0_amd64.deb` | [Download](https://github.com/samermerhj/RSSReader/releases/latest) |
-| **Linux (AppImage)** | `RSSReader_Qt-x86_64.AppImage` | [Download](https://github.com/samermerhj/RSSReader/releases/latest) |
-| **Windows (.exe)** | `RSSReader_Qt.exe` | [Download](https://github.com/samermerhj/RSSReader/releases/latest) |
-## 🛠 Building from Source
+| **Linux (.deb)** | `rssreader-1.0.0-Linux.deb` | [Download](https://github.com/samermerhj/RSSReader/releases/latest) |
+| **Linux (AppImage)** | `RSSReader-x86_64.AppImage` | [Download](https://github.com/samermerhj/RSSReader/releases/latest) |
+| **Windows (.zip)** | `windows-deployed.zip` | [Download](https://github.com/samermerhj/RSSReader/releases/latest) |
 
-### Requirements:
+---
+## 🔧 Windows Requirements
 
-| Library | Version |
-| :--- | :--- |
-| Qt | 5.15+ (Widgets, Network, Sql, Xml, Svg) |
-| CMake | 3.10+ |
-| C++ | 17+ |
-| Fonts | `sudo apt install fonts-noto-color-emoji` (for emoji support) |
+> ⚠️ **Important for Windows 7 users**:  
+> Your system may not support HTTPS (TLS 1.2) by default.  
+> To use the Windows version properly, please ensure the following:
 
-### Build Steps (Linux):
+### 📦 Required Components
 
+| Component | Version | Why |
+| :--- | :--- | :--- |
+| **OpenSSL** | 1.1.x (64-bit) | Required for secure HTTPS connections. |
+| **Microsoft Update** | KB3140245 | Enables TLS 1.2 support on Windows 7. |
 
-# 1. Clone the repository
-git clone https://github.com/samermerhj/RSSReader.git
-cd RSSReader
+### 🛠️ Installation Steps (Windows 7 Only)
 
-# 2. Create build directory
+1. **Download and install** the official update from Microsoft:  
+   [KB3140245 – TLS 1.2 Support](https://support.microsoft.com/help/3140245)
+
+2. **Download OpenSSL DLLs** (64-bit) from the official source:  
+   [Win64 OpenSSL 1.1.1](https://slproweb.com/download/Win64OpenSSL-1_1_1q.msi)
+
+3. After installing OpenSSL, copy these two files from `C:\Program Files\OpenSSL-Win64\bin` to the folder containing `rssreader.exe`:
+   - `libcrypto-1_1-x64.dll`
+   - `libssl-1_1-x64.dll`
+
+4. **Restart your computer** to apply all changes.
+
+5. **Add enable_tls.reg**
+
+   ```
+   Windows Registry Editor Version 5.00
+   
+   [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client]
+   "DisabledByDefault"=dword:00000000
+   "Enabled"=dword:00000001
+   ```
+
+### ✅ Verification
+
+After completing the steps above, the app should be able to fetch news from HTTPS sources (like BBC, RT, SkyNews) without errors.
+
+> **Note for Windows 10/11 users**:  
+> These steps are generally not required, as TLS 1.2 and OpenSSL are already included in the system.
+
+## 🛠️ Building from Source (Linux)
+
+### 1. Install Dependencies
+
+```bash
+sudo apt update
+sudo apt install -y build-essential cmake qtbase5-dev \
+    libqt5svg5-dev libqt5sql5-sqlite qt5-qmake dpkg-dev
+```
+
+### 2. Build .deb Package
+
+```bash
+# Clean any previous build
+rm -rf build
+
+# Create build directory
 mkdir build && cd build
 
-# 3. Run CMake (Release build)
+# Run CMake (Release build)
 cmake -DCMAKE_BUILD_TYPE=Release ..
 
-# 4. Build
+# Compile
 make -j$(nproc)
 
-# 5. Run
-./RSSReader_Qt
+# Create .deb package
+cpack -G DEB
 
+# Install the package
+sudo apt install ./rssreader-1.0.0-Linux.deb
+```
 
-📦 Creating a .deb Package (Linux)
+✅ **Done!** Find `RSSReader` in your application menu or run from terminal:
+```bash
+rssreader
+```
 
+---
 
-# 1. Create the structure
-mkdir -p RSSReader/usr/bin
-cp build/RSSReader_Qt RSSReader/usr/bin/
+### 📦 Build AppImage (Portable)
 
-mkdir -p RSSReader/usr/share/RSSReader/resources
-cp -r resources/* RSSReader/usr/share/RSSReader/resources/
+To get a single executable file without installation:
 
-mkdir -p RSSReader/usr/share/RSSReader/translations
-cp translations/*.qm RSSReader/usr/share/RSSReader/translations/
+```bash
+# 1. Install additional dependencies
+sudo apt install -y libfuse2 wget file
 
-mkdir -p RSSReader/usr/share/icons/hicolor/scalable/apps/
-cp icons/tray_icon.svg RSSReader/usr/share/icons/hicolor/scalable/apps/rssreader.svg
-
-# 2. Create control file
-mkdir -p RSSReader/DEBIAN
-cat > RSSReader/DEBIAN/control << EOF
-Package: rssreader-qt
-Version: 1.0.0
-Section: utils
-Priority: optional
-Architecture: amd64
-Depends: libqt5core5a, libqt5gui5, libqt5widgets5, libqt5network5, libqt5sql5, libqt5xml5, libqt5svg5
-Maintainer: Samer Merhj <mjosak7@gmail.com>
-Description: RSSReader - Smart News Magazine
- Advanced RSS reader supporting multiple sources, daily magazine, and translation.
-Homepage: https://github.com/samermerhj/RSSReader
-EOF
-
-# 3. Build the package
-dpkg-deb --build RSSReader/
-📦 Creating an AppImage (Portable)
-
-
-# 1. Download linuxdeployqt
-wget https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+# 2. Download linuxdeployqt
+wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
 chmod +x linuxdeployqt-continuous-x86_64.AppImage
+sudo mv linuxdeployqt-continuous-x86_64.AppImage /usr/local/bin/linuxdeployqt
 
-# 2. Prepare files
-mkdir -p AppDir/usr/bin
-cp build/RSSReader_Qt AppDir/usr/bin/
-cp -r resources AppDir/usr/share/RSSReader/
-cp -r translations AppDir/usr/share/RSSReader/
-cp icons/tray_icon.svg AppDir/rssreader.svg
+# 3. Build (same steps as above)
+rm -rf build && mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make -j$(nproc)
 
-# 3. Create AppImage
-./linuxdeployqt-continuous-x86_64.AppImage AppDir/usr/bin/RSSReader_Qt -appimage
+# 4. Prepare AppDir
+mkdir -p AppDir/usr/share/RSSReader
+cp rssreader AppDir/usr/bin/
+cp -r ../resources AppDir/usr/share/RSSReader/
+cp -r ../translations AppDir/usr/share/RSSReader/
+cp ../icons/tray_icon.svg AppDir/rssreader.svg
 
+# 5. Create AppImage
+linuxdeployqt AppDir/usr/bin/rssreader -appimage
 
+# Result: RSSReader-x86_64.AppImage
+```
 
-📄 License
+### ✅ Run AppImage
+
+```bash
+chmod +x RSSReader-x86_64.AppImage
+./RSSReader-x86_64.AppImage
+```
+
+---
+
+### 🖼️ Install Emoji Fonts (Optional)
+
+To ensure emojis display correctly:
+
+```bash
+sudo apt install fonts-noto-color-emoji
+```
+
+| Platform | Method |
+| :--- | :--- |
+| **Linux (Debian/Ubuntu)** | `sudo apt install fonts-noto-color-emoji` |
+| **Linux (Fedora)** | `sudo dnf install google-noto-emoji-color-fonts` |
+| **Linux (Arch)** | `sudo pacman -S noto-fonts-emoji` |
+| **Windows** | Download from [Google Noto Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji) then install the font |
+| **macOS** | `brew install --cask font-noto-color-emoji` |
+
+---
+
+### 🪟 Note for Windows Users
+
+To build on Windows, use **MSVC** or **MinGW** with Qt installed, then:
+
+```bash
+# Via Qt Creator or command line
+cmake -B build -S .
+cmake --build build --config Release
+```
+
+> Windows does not support building .deb packages (Linux-specific).
+
+## 📄 License
 
 This software is free software under the GNU Affero General Public License version 3.0 (AGPLv3).
 
-What does this mean?
+**What does this mean?**
 
-✅ You can ⚠️ You must ⛔ You cannot
-Use it for any purpose. If you distribute a modified version, open your source code under AGPLv3. Sell this software or any modified version without explicit permission.
-Study and learn from the source code. Keep the AGPLv3 license in every copy. Use it in closed-source software without a commercial license.
-Share it with anyone. Indicate the changes you made. Remove copyright and license notices from the files.
+| ✅ You can | ⚠️ You must | ⛔ You cannot |
+| :--- | :--- | :--- |
+| Use it for any purpose. | If you distribute a modified version, open your source code under AGPLv3. | Sell this software or any modified version without explicit permission. |
+| Study and learn from the source code. | Keep the AGPLv3 license in every copy. | Use it in closed-source software without a commercial license. |
+| Share it with anyone. | Indicate the changes you made. | Remove copyright and license notices from the files. |
 
-For Commercial Use:
+**For Commercial Use:**
 
 If you want to:
-
 · Integrate the software into a commercial closed-source product.
 · Modify the code without opening the source.
 · Distribute the software commercially.
 
 Contact me for a paid commercial license.
-Open an Issue titled Commercial License or email me.
+Open an Issue titled "Commercial License" or email me.
 
-
-
-❤️ Support This Project
+## ❤️ Support This Project
 
 Your direct support helps me survive, pay the internet bill, and continue development.
 
@@ -202,32 +270,29 @@ You're seeing this, you'll be among the first to know about the professional ver
 
 ₿ Direct Cryptocurrency Donation
 
-Currency Address
-Bitcoin (BTC) bc1qrh4nw70w5hyrg4myuppv879z6sp40lzvr9k69m
+| Currency | Address |
+| :--- | :--- |
+| Bitcoin (BTC) | bc1qrh4nw70w5hyrg4myuppv879z6sp40lzvr9k69m |
 
+## 📞 Contact
 
+| Method | Link |
+| :--- | :--- |
+| Email | mjosak7@gmail.com |
+| GitHub Issues | Report Bugs |
+| Commercial License Requests | Open an Issue titled "Commercial License" |
+| Repository | https://github.com/samermerhj/RSSReader |
 
-📞 Contact
-
-Method Link
-Email mjosak7@gmail.com
-GitHub Issues Report Bugs
-Commercial License Requests Open an Issue titled "Commercial License"
-Repository https://github.com/samermerhj/RSSReader
-
-
-
-🙏 Special Thanks
+## 🙏 Special Thanks
 
 · Qt Framework – For providing a powerful and open development platform.
 · Open Source Community – For inspiration and continuous support.
 · Everyone who supports this project – You are the reason I keep going.
 
-
+---
 
 <p align="center">
   <b>Made with ❤️ by Samer Merhj</b>
   <br/>
   <sub>© 2026 – RSSReader – Smart News Magazine</sub>
 </p>
-```

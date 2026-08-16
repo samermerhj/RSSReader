@@ -13,6 +13,11 @@ jobs:
     - name: Checkout source code
       uses: actions/checkout@v4
 
+    # ---------- الخطوة الجديدة: تثبيت OpenSSL رسمياً ----------
+    - name: Install OpenSSL (for Windows 7 compatibility)
+      run: choco install openssl --version=1.1.1.2100 -y
+      shell: powershell
+
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
@@ -41,6 +46,14 @@ jobs:
         windeployqt.exe rssreader.exe
       shell: bash
 
+    # ---------- نسخ OpenSSL من المسار المضمون ----------
+    - name: Copy OpenSSL DLLs (for HTTPS support)
+      run: |
+        cd build
+        cp "C:/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" .
+        cp "C:/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" .
+      shell: bash
+
     - name: Copy resources and translations
       run: |
         cd build
@@ -48,24 +61,8 @@ jobs:
         cp -r ../translations .
       shell: bash
 
-    - name: Upload Deployed Folder
+    - name: Upload Deployed Folder (Portable ZIP)
       uses: actions/upload-artifact@v4
       with:
         name: windows-deployed
         path: build/
-  
-    - name: Install NSIS (makensis)
-      run: |
-        choco install nsis
-      shell: powershell
-
-    - name: Build Installer
-      run: |
-        makensis installer.nsi
-      shell: cmd
-
-    - name: Upload Installer
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-installer
-        path: RSSReader_Setup.exe
