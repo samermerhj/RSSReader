@@ -98,29 +98,9 @@ Professional features will come later.
 | **OpenSSL** | 1.1.x (64-bit) | Required for secure HTTPS connections. |
 | **Microsoft Update** | KB3140245 | Enables TLS 1.2 support on Windows 7. |
 
-### 🛠️ Installation Steps (Windows 7 Only)
+### 🛠️ Installation Steps (Windows 7 not work)
 
-1. **Download and install** the official update from Microsoft:  
-   [KB3140245 – TLS 1.2 Support](https://support.microsoft.com/help/3140245)
-
-2. **Download OpenSSL DLLs** (64-bit) from the official source:  
-   [Win64 OpenSSL 1.1.1](https://slproweb.com/download/Win64OpenSSL-1_1_1q.msi)
-
-3. After installing OpenSSL, copy these two files from `C:\Program Files\OpenSSL-Win64\bin` to the folder containing `rssreader.exe`:
-   - `libcrypto-1_1-x64.dll`
-   - `libssl-1_1-x64.dll`
-
-4. **Restart your computer** to apply all changes.
-
-5. **Add enable_tls.reg**
-
-   ```
-   Windows Registry Editor Version 5.00
-   
-   [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client]
-   "DisabledByDefault"=dword:00000000
-   "Enabled"=dword:00000001
-   ```
+ **fix OpenSSL  ** 
 
 ### ✅ Verification
 
