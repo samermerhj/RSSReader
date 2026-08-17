@@ -7,7 +7,7 @@
 #include <QSettings>
 #include <QMessageBox>
 #include "MainWindow.h"
-#include "ResourceManager.h"  // 🔥 تمت الإضافة
+#include "ResourceManager.h"
 
 /**
  * Copyright (C) 2026 Samer Merhj <mjosak7@gmail.com>
@@ -27,6 +27,9 @@
  */
 int main(int argc, char *argv[])
 {
+    // 🔥 تهيئة OpenSSL (خاص بويندوز، لا تؤثر على لينكس)
+    ResourceManager::initOpenSSL();
+
     QApplication app(argc, argv);
 
     // ---------- 1. إعدادات التطبيق ----------
@@ -40,7 +43,7 @@ int main(int argc, char *argv[])
 
     // إذا لم تكن محفوظة، نعتمد على لغة النظام
     QString lang = savedLang.isEmpty() ? QLocale::system().name() : savedLang;
-    QString langCode = lang.left(2); // أول حرفين (ar, fr, en, zh, ru, es, de...)
+    QString langCode = lang.left(2);
 
     qDebug() << "🌐 اللغة المختارة:" << lang << "(الكود:" << langCode << ")";
 
@@ -48,20 +51,15 @@ int main(int argc, char *argv[])
     QTranslator appTranslator;
     bool translationLoaded = false;
 
-    // 🔥 الحصول على مسار الترجمات من ResourceManager
     QString transPath = ResourceManager::getTranslationsPath();
-
-    // محاولة تحميل الترجمة بناءً على اللغة
     QString translationFile = transPath + "/RSSReader_" + lang;
     QString translationFileShort = transPath + "/RSSReader_" + langCode;
 
-    // محاولة تحميل الملف الكامل (مثل RSSReader_ar_SA) أولاً، ثم الملف المختصر (RSSReader_ar)
     if (appTranslator.load(translationFile) || appTranslator.load(translationFileShort)) {
         app.installTranslator(&appTranslator);
         translationLoaded = true;
         qDebug() << "✅ تم تحميل الترجمة للغة:" << lang;
     } else {
-        // محاولة تحميل اللغة الإنجليزية كحل احتياطي
         QString enFile = transPath + "/RSSReader_en";
         if (appTranslator.load(enFile)) {
             app.installTranslator(&appTranslator);
@@ -72,15 +70,13 @@ int main(int argc, char *argv[])
         }
     }
 
-    // ---------- 4. تحميل ترجمة Qt (أزرار الحوارات) ----------
+    // ---------- 4. تحميل ترجمة Qt ----------
     QTranslator qtTranslator;
     QString qtTranslationsPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
 
-    // محاولة تحميل ترجمة Qt للغة المحددة
     QString qtTranslationFile = QString("qt_%1").arg(lang);
     QString qtTranslationFileShort = QString("qt_%1").arg(langCode);
 
-    // نبحث في مسار النظام أولاً، ثم في مجلد الترجمات الخاص بنا
     if (!qtTranslationsPath.isEmpty()) {
         if (qtTranslator.load(qtTranslationFile, qtTranslationsPath) ||
             qtTranslator.load(qtTranslationFileShort, qtTranslationsPath) ||
@@ -94,7 +90,6 @@ int main(int argc, char *argv[])
     }
 
     // ---------- 5. اتجاه الواجهة ----------
-    // اللغات التي تكتب من اليمين لليسار
     if (langCode == "ar" || langCode == "fa" || langCode == "he" || langCode == "ur") {
         app.setLayoutDirection(Qt::RightToLeft);
         qDebug() << "🔄 اتجاه الواجهة: من اليمين إلى اليسار (RTL)";

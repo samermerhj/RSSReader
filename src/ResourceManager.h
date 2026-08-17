@@ -23,12 +23,26 @@
 class ResourceManager
 {
 public:
-    static QString getBasePath();               // ~/rsss/
-    static QString getResourcesPath();          // ~/rsss/resources/
-    static QString getWritableResourcesPath();  // ~/rsss/resources/ (نفسه)
-    static QString getTranslationsPath();       // ~/rsss/translations/
-    static QString getCachePath();              // ~/rsss/cache/
-    static QString getDataPath();               // ~/rsss/ (لقاعدة البيانات)
+    // المسار الأساسي
+    static QString getBasePath();
+
+    // الموارد الثابتة (للقراءة فقط)
+    static QString getResourcesPath();
+
+    // الموارد القابلة للكتابة (مثل icon_mappings.json)
+    static QString getWritableResourcesPath();
+
+    // الترجمات
+    static QString getTranslationsPath();
+
+    // الكاش (الصور المؤقتة)
+    static QString getCachePath();
+
+    // البيانات الدائمة (قاعدة البيانات)
+    static QString getDataPath();
+
+    // 🔥 تهيئة OpenSSL (خاص بويندوز، لا تؤثر على لينكس)
+    static void initOpenSSL();
 };
 
 #endif // RESOURCEMANAGER_H
