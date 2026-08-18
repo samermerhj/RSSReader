@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(RSSReader VERSION 1.0.0 LANGUAGES CXX)
+project(RSSReader VERSION 1.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -14,7 +14,6 @@ find_package(Qt5 REQUIRED COMPONENTS
     Widgets Network Sql Xml Svg
 )
 
-# قائمة المصادر الأساسية (بدون ResourceManager)
 set(SOURCES
     src/main.cpp
     src/MainWindow.cpp
@@ -26,14 +25,8 @@ set(SOURCES
     src/IconManager.cpp
     src/ImageDatabase.cpp
     src/SmartImageProvider.cpp
+    src/ResourceManager.cpp
 )
-
-# إضافة ResourceManager حسب نظام التشغيل
-if (WIN32)
-    list(APPEND SOURCES src/ResourceManager_win.cpp)
-else()
-    list(APPEND SOURCES src/ResourceManager.cpp)
-endif()
 
 add_executable(rssreader ${SOURCES})
 
@@ -86,7 +79,7 @@ endif()
 if (UNIX AND NOT APPLE)
     set(CPACK_GENERATOR "DEB")
     set(CPACK_PACKAGE_NAME "rssreader")
-    set(CPACK_PACKAGE_VERSION "1.0.0")
+    set(CPACK_PACKAGE_VERSION "1.1.0")
     set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Samer Merhj <mjosak7@gmail.com>")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "RSSReader - Smart News Magazine")

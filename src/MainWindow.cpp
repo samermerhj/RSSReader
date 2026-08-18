@@ -31,6 +31,7 @@
 #include <QPainter>
 #include <QTextEdit>
 #include <QClipboard>
+#include <QDir>
 /**
  * Copyright (C) 2026 Samer Merhj <mjosak7@gmail.com>
  *
@@ -91,10 +92,41 @@ MainWindow::MainWindow(QWidget *parent)
     updateSourceCombo();
 
     // ---------- أيقونة التطبيق وعلبة النظام ----------
-    QIcon appIcon(":/icons/tray_icon.svg");  // تأكد من وجود الملف icons/tray_icon.png
+    QIcon appIcon;
+
+// 1. حاول تحميل الأيقونة من الملف (إذا كانت موجودة)
+    QString iconPath = QDir::homePath() + "/rsss/resources/tray_icon.svg";
+    if (QFile::exists(iconPath)) {
+    appIcon = QIcon(iconPath);
+    } else {
+    // 2. إذا لم توجد، استخدم أيقونة مدمجة من Qt (مضمونة الظهور)
+        appIcon = QApplication::style()->standardIcon(QStyle::SP_ComputerIcon);
+    }
+
+// 3. تأكد من أن الأيقونة ليست فارغة (احتياطي إضافي)
+    if (appIcon.isNull()) {
+    // أيقونة افتراضية جداً (قطعة مستطيلة)
+        QPixmap pixmap(16, 16);
+        pixmap.fill(Qt::blue);
+        appIcon = QIcon(pixmap);
+    }
+
     setWindowIcon(appIcon);
     QApplication::setWindowIcon(appIcon);
+
+// إنشاء أيقونة علبة النظام مع نفس الأيقونة
     trayIcon = new QSystemTrayIcon(appIcon, this);
+
+// تأكد من أن علبة النظام تعمل حتى لو كانت الأيقونة فارغة
+    trayIcon->setToolTip(tr("RSSReader - Click to open"));
+    connect(trayIcon, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason reason) {
+        if (reason == QSystemTrayIcon::Trigger) {
+            showNormal();
+            activateWindow();
+            raise();
+        }
+    });
+    trayIcon->show();
 
     // ضبط حجم النافذة حسب الشاشة
     QScreen *screen = QGuiApplication::primaryScreen();
@@ -1187,7 +1219,7 @@ void MainWindow::showAboutDialog()
     layout->addWidget(titleLabel);
 
     // ===== الإصدار =====
-    QLabel *versionLabel = new QLabel(tr("Version 1.0.0"));
+    QLabel *versionLabel = new QLabel(tr("Version 1.1.0"));
     versionLabel->setStyleSheet("font-size: 14px; color: #7f8c8d;");
     versionLabel->setAlignment(Qt::AlignCenter);
     layout->addWidget(versionLabel);

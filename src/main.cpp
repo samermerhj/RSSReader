@@ -7,7 +7,7 @@
 #include <QSettings>
 #include <QMessageBox>
 #include "MainWindow.h"
-#include "ResourceManager.h"  // 🔥 تمت الإضافة
+#include "ResourceManager.h"
 
 /**
  * Copyright (C) 2026 Samer Merhj <mjosak7@gmail.com>
@@ -25,6 +25,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -48,7 +49,7 @@ int main(int argc, char *argv[])
     QTranslator appTranslator;
     bool translationLoaded = false;
 
-    // 🔥 الحصول على مسار الترجمات من ResourceManager
+    // الحصول على مسار الترجمات من ResourceManager
     QString transPath = ResourceManager::getTranslationsPath();
 
     // محاولة تحميل الترجمة بناءً على اللغة

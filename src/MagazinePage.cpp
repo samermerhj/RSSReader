@@ -1,6 +1,6 @@
 #include "MagazinePage.h"
 #include "SmartImageProvider.h"
-#include "ResourceManager.h"  // 🔥 تمت الإضافة
+#include "ResourceManager.h"
 #include <QGridLayout>
 #include <QLabel>
 #include <QFrame>
@@ -29,6 +29,7 @@
 #include <QSharedPointer>
 #include <QPair>
 #include <QRegularExpression>
+#include <QCoreApplication>  // 🔥 للتأكد من وجودها
 
 /**
  * Copyright (C) 2026 Samer Merhj <mjosak7@gmail.com>
@@ -68,6 +69,21 @@ static QString detectLanguage(const QString &text) {
         if (ch.unicode() >= 0x0600 && ch.unicode() <= 0x06FF) return "ar";
     }
     return "en";
+}
+
+// 🔥 دالة ترجمة موحدة تستخدم السياق الصحيح (MainWindow)
+static QString getTranslatedCategory(const QString &cat)
+{
+    // الترجمات موجودة في سياق MainWindow
+    if (cat == "politics") return QCoreApplication::translate("MainWindow", "politics");
+    if (cat == "sports") return QCoreApplication::translate("MainWindow", "sports");
+    if (cat == "health") return QCoreApplication::translate("MainWindow", "health");
+    if (cat == "economy") return QCoreApplication::translate("MainWindow", "economy");
+    if (cat == "tech") return QCoreApplication::translate("MainWindow", "tech");
+    if (cat == "military") return QCoreApplication::translate("MainWindow", "military");
+    if (cat == "environment") return QCoreApplication::translate("MainWindow", "environment");
+    if (cat == "culture") return QCoreApplication::translate("MainWindow", "culture");
+    return QCoreApplication::translate("MainWindow", "default");
 }
 
 MagazinePage::MagazinePage(QWidget *parent)
@@ -216,7 +232,8 @@ void MagazinePage::createCard(const NewsItem &item, int row, int col)
     QString langCode = detectLanguage(item.title + " " + item.description);
     QString category = IconManager::instance()->classifyNews(item.title, item.description, langCode);
 
-    QLabel *categoryLabel = new QLabel(tr(category.toUtf8().constData()), infoWidget);
+    // 🔥 التصنيف المكتوب تحت الصورة (معرب)
+    QLabel *categoryLabel = new QLabel(getTranslatedCategory(category), infoWidget);
     categoryLabel->setStyleSheet(QString(R"(
         QLabel {
             font-size: 11px;
@@ -297,11 +314,11 @@ void MagazinePage::createCard(const NewsItem &item, int row, int col)
 
         QWidget *altBar = new QWidget(card);
         altBar->setStyleSheet("background: transparent;");   
-        altBar->setFixedWidth(110); // عرض ثابت مناسب للأزرار
+        altBar->setFixedWidth(110);
         QVBoxLayout *altLayout = new QVBoxLayout(altBar);
         altLayout->setContentsMargins(6, 6, 6, 6);
         altLayout->setSpacing(6);
-        altLayout->addStretch(); // يدفع الأزرار للأعلى
+        altLayout->addStretch();
 
         for (const QString &altCat : catsToShow) {
             if (altCat == category && !isDefault) continue;
@@ -322,22 +339,16 @@ void MagazinePage::createCard(const NewsItem &item, int row, int col)
                 }
                 QPushButton:hover { border: 2px solid white; }
             )").arg(color));
-            btn->setText(tr(altCat.toUtf8().constData()));
+            // 🔥 الأزرار البديلة معربة
+            btn->setText(getTranslatedCategory(altCat));
 
             connect(btn, &QPushButton::clicked, this, [this, item, altCat, imageLabel, categoryLabel, altBar, langCode]() {
-                // 1. تعلم من التصحيح
                 SmartImageProvider::instance()->learnFromNews(item, altCat, langCode);
-
-                // 2. ✅ أعد تحميل IconManager من الملف المُحدّث
                 IconManager::instance()->loadKeywordsFromJSON();
-
-                // 3. أعد توليد الصورة بالتصنيف الجديد
                 QPixmap newImage = SmartImageProvider::instance()->getImageForNews(item, 400, 200, langCode);
                 imageLabel->setPixmap(newImage);
                 imageLabel->repaint();
-
-                // 4. تحديث النص واللون
-                categoryLabel->setText(tr(altCat.toUtf8().constData()));
+                categoryLabel->setText(getTranslatedCategory(altCat));
                 categoryLabel->setStyleSheet(QString(R"(
                     QLabel {
                         font-size: 11px; color: white; background-color: %1;
@@ -345,16 +356,13 @@ void MagazinePage::createCard(const NewsItem &item, int row, int col)
                         max-width: 100px;
                     }
                 )").arg(getCategoryColor(altCat)));
-
-                // 5. إخفاء الأزرار
                 altBar->deleteLater();
             });
 
             altLayout->addWidget(btn);
         }
-        altLayout->addStretch(); // يدفع الأزرار للأسفل
+        altLayout->addStretch();
 
-        // وضع الشريط على يمين الصورة
         altBar->setParent(imageLabel);
         altBar->setGeometry(imageLabel->width() - 110, 0, 110, 200);
         altBar->show();
@@ -427,7 +435,6 @@ void MagazinePage::updateLoadingStatus()
     }
 }
 
-// 🔥 تم التعديل لاستخدام ResourceManager للكاش
 bool MagazinePage::loadImageFromCache(const QString &url, QLabel *targetLabel)
 {
     QString key = getCacheKey(url);
@@ -440,7 +447,6 @@ bool MagazinePage::loadImageFromCache(const QString &url, QLabel *targetLabel)
         return true;
     }
     
-    // استخدام ResourceManager للحصول على مسار الكاش الصحيح
     QString cachePath = ResourceManager::getCachePath() + "/images/";
     QString filePath = cachePath + key + ".jpg";
     
@@ -460,7 +466,6 @@ bool MagazinePage::loadImageFromCache(const QString &url, QLabel *targetLabel)
     return false;
 }
 
-// 🔥 تم التعديل لاستخدام ResourceManager للكاش
 void MagazinePage::saveImageToCache(const QString &url, const QByteArray &data)
 {
     QString key = getCacheKey(url);
@@ -470,7 +475,6 @@ void MagazinePage::saveImageToCache(const QString &url, const QByteArray &data)
         imageCache.insert(key, pixmap, imageSize);
     }
     
-    // استخدام ResourceManager للحصول على مسار الكاش الصحيح
     QString cachePath = ResourceManager::getCachePath() + "/images/";
     QDir cacheDir(cachePath);
     if (!cacheDir.exists()) {

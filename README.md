@@ -3,7 +3,7 @@
 [![License: AGPLv3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Qt Version](https://img.shields.io/badge/Qt-5.15+-green.svg)](https://www.qt.io/)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows-lightgrey.svg)](https://github.com/samermerhj/RSSReader)
-[![Version](https://img.shields.io/badge/Version-1.0.0-orange.svg)](https://github.com/samermerhj/RSSReader/releases)
+[![Version](https://img.shields.io/badge/Version-1.1.0-orange.svg)](https://github.com/samermerhj/RSSReader/releases)
 
 ## 💡 The Story
 
@@ -74,7 +74,7 @@ Professional features will come later.
 
 ## 📥 Download
 
-**Version:** `1.0.0`
+**Version:** `1.1.0`
 
 ### Free Version (Open Source)
 
