@@ -5,41 +5,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
-# ============================================================
-# إعدادات خاصة بكل نظام تشغيل
-# ============================================================
-
-# ---------- ويندوز ----------
+# إخفاء نافذة الطرفية على ويندوز
 if (WIN32)
-    # إخفاء نافذة الطرفية
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
 endif()
-
-# ---------- ماك (macOS) ----------
-if (APPLE)
-    # تحديد التوافق مع macOS 10.14 Mojave
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.14")
-    
-    # تعيين اسم التطبيق ونوع الحزمة
-    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
-    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
-    
-    # تحديد ملف Info.plist (إذا كنت ستستخدمه)
-    # set(MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/macos/Info.plist)
-    set(CMAKE_MACOSX_BUNDLE YES)
-endif()
-
-# ============================================================
-# البحث عن مكتبات Qt
-# ============================================================
 
 find_package(Qt5 REQUIRED COMPONENTS
     Widgets Network Sql Xml Svg
 )
-
-# ============================================================
-# ملفات المصدر
-# ============================================================
 
 set(SOURCES
     src/main.cpp
@@ -55,24 +28,9 @@ set(SOURCES
     src/ResourceManager.cpp
 )
 
-# ============================================================
-# إنشاء الملف التنفيذي
-# ============================================================
-
 add_executable(rssreader ${SOURCES})
 
-# إعدادات خاصة بـ macOS لتطبيق .app
-if (APPLE)
-    set_target_properties(rssreader PROPERTIES
-        MACOSX_BUNDLE TRUE
-        OUTPUT_NAME "RSSReader"
-    )
-endif()
-
-# ============================================================
-# نسخ الموارد والترجمات إلى مجلد البناء (للتطوير)
-# ============================================================
-
+# نسخ resources و translations إلى مجلد البناء (للتطوير)
 add_custom_command(TARGET rssreader POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/resources
@@ -87,10 +45,6 @@ add_custom_command(TARGET rssreader POST_BUILD
     COMMENT "نسخ translations إلى مجلد البناء"
 )
 
-# ============================================================
-# ربط المكتبات
-# ============================================================
-
 target_link_libraries(rssreader
     Qt5::Widgets
     Qt5::Network
@@ -99,10 +53,7 @@ target_link_libraries(rssreader
     Qt5::Svg
 )
 
-# ============================================================
-# التثبيت (لينكس فقط)
-# ============================================================
-
+# ---------- التثبيت (لينكس فقط) ----------
 if (UNIX AND NOT APPLE)
     install(TARGETS rssreader RUNTIME DESTINATION bin)
     install(DIRECTORY resources/ DESTINATION share/RSSReader/resources)
@@ -124,10 +75,7 @@ if (UNIX AND NOT APPLE)
     ")
 endif()
 
-# ============================================================
-# إعدادات CPack (لحزمة .deb فقط على لينكس)
-# ============================================================
-
+# ---------- إعدادات CPack (لحزمة .deb) ----------
 if (UNIX AND NOT APPLE)
     set(CPACK_GENERATOR "DEB")
     set(CPACK_PACKAGE_NAME "rssreader")
