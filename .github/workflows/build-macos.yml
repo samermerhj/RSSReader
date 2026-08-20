@@ -1,11 +1,11 @@
-ame: Build macOS App (Qt 5.15.2)
+name: Build macOS App (Qt 5.15.2)
 
 on:
   workflow_dispatch:
 
 jobs:
   build-macos:
-    runs-on: macos-13
+    runs-on: macos-13   # ✅ خادم Intel (x86_64) متوافق مع Qt 5.15.2
 
     steps:
     - name: Checkout source code
