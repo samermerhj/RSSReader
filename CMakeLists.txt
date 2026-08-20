@@ -17,12 +17,15 @@ endif()
 
 # ---------- ماك (macOS) ----------
 if (APPLE)
+    # تحديد التوافق مع macOS 10.14 Mojave
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.14")
+    
     # تعيين اسم التطبيق ونوع الحزمة
     set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
     set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
     
-    # تحديد ملف Info.plist
-    set(MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/macos/Info.plist)
+    # تحديد ملف Info.plist (إذا كنت ستستخدمه)
+    # set(MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/macos/Info.plist)
     set(CMAKE_MACOSX_BUNDLE YES)
 endif()
 
@@ -58,11 +61,10 @@ set(SOURCES
 
 add_executable(rssreader ${SOURCES})
 
-# إذا كان النظام ماك، غيّر اسم الملف التنفيذي إلى RSSReader.app
+# إعدادات خاصة بـ macOS لتطبيق .app
 if (APPLE)
     set_target_properties(rssreader PROPERTIES
         MACOSX_BUNDLE TRUE
-        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/macos/Info.plist
         OUTPUT_NAME "RSSReader"
     )
 endif()
