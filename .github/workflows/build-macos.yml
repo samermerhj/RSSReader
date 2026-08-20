@@ -1,4 +1,4 @@
-name: Build macOS App (Qt 5.15.2)
+ame: Build macOS App (Qt 5.15.2)
 
 on:
   workflow_dispatch:
