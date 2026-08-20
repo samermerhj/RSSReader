@@ -1,11 +1,11 @@
-name: Build macOS App (Qt 5.15.2)
+ame: Build macOS App (Qt 5.15.2)
 
 on:
-  workflow_dispatch:   # تشغيل يدوي فق
+  workflow_dispatch:
 
 jobs:
   build-macos:
-    runs-on: macos-latest
+    runs-on: macos-13
 
     steps:
     - name: Checkout source code
