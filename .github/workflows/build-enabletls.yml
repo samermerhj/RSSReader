@@ -1,7 +1,7 @@
-name: Build EnableTLS.exe (Windows)
+name: Build EnableTLS.exe
 
 on:
-  workflow_dispatch:   # يسمح بتشغيل البناء يدوياً
+  workflow_dispatch:   # تشغيل يدوي فقط
 
 jobs:
   build:
@@ -11,48 +11,9 @@ jobs:
     - name: Checkout source code
       uses: actions/checkout@v4
 
-    - name: Create EnableTLS.c
+    - name: Compile EnableTLS.c
       run: |
-        @echo off
-        echo #include ^<windows.h^> > EnableTLS.c
-        echo #include ^<stdio.h^> >> EnableTLS.c
-        echo. >> EnableTLS.c
-        echo void SetRegistryDWORD(HKEY hKeyRoot, const char* subKey, const char* valueName, DWORD data) { >> EnableTLS.c
-        echo     HKEY hKey; >> EnableTLS.c
-        echo     LONG result = RegCreateKeyExA(hKeyRoot, subKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, ^&hKey, NULL); >> EnableTLS.c
-        echo     if (result == ERROR_SUCCESS) { >> EnableTLS.c
-        echo         RegSetValueExA(hKey, valueName, 0, REG_DWORD, (const BYTE*)&data, sizeof(DWORD)); >> EnableTLS.c
-        echo         RegCloseKey(hKey); >> EnableTLS.c
-        echo         printf("✅ تم تعيين: %%s\\%%s = %%lu\n", subKey, valueName, data); >> EnableTLS.c
-        echo     } else { >> EnableTLS.c
-        echo         printf("❌ فشل في إنشاء/فتح المفتاح: %%s\n", subKey); >> EnableTLS.c
-        echo     } >> EnableTLS.c
-        echo } >> EnableTLS.c
-        echo. >> EnableTLS.c
-        echo int main() { >> EnableTLS.c
-        echo     printf("🔧 أداة تمكين TLS 1.2 لـ Windows 7\n"); >> EnableTLS.c
-        echo     printf("=======================================\n\n"); >> EnableTLS.c
-        echo     SetRegistryDWORD(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\SCHANNEL\\Protocols\\TLS 1.2\\Client", "DisabledByDefault", 0); >> EnableTLS.c
-        echo     SetRegistryDWORD(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\SCHANNEL\\Protocols\\TLS 1.2\\Client", "Enabled", 1); >> EnableTLS.c
-        echo     SetRegistryDWORD(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\SCHANNEL\\Protocols\\TLS 1.2\\Server", "DisabledByDefault", 0); >> EnableTLS.c
-        echo     SetRegistryDWORD(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\SCHANNEL\\Protocols\\TLS 1.2\\Server", "Enabled", 1); >> EnableTLS.c
-        echo     SetRegistryDWORD(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\.NETFramework\\v4.0.30319", "SchUseStrongCrypto", 1); >> EnableTLS.c
-        echo     SetRegistryDWORD(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\.NETFramework\\v4.0.30319", "SystemDefaultTlsVersions", 1); >> EnableTLS.c
-        echo     SetRegistryDWORD(HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\Microsoft\\.NETFramework\\v4.0.30319", "SchUseStrongCrypto", 1); >> EnableTLS.c
-        echo     SetRegistryDWORD(HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\Microsoft\\.NETFramework\\v4.0.30319", "SystemDefaultTlsVersions", 1); >> EnableTLS.c
-        echo     SetRegistryDWORD(HKEY_LOCAL_MACHINE, "SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\WinHttp", "DefaultSecureProtocols", 0x00000800); >> EnableTLS.c
-        echo     SetRegistryDWORD(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\WinHttp", "DefaultSecureProtocols", 0x00000800); >> EnableTLS.c
-        echo     printf("\n✅ تم تطبيق جميع الإعدادات بنجاح.\n"); >> EnableTLS.c
-        echo     printf("⚠️ يرجى إعادة تشغيل الكمبيوتر لتطبيق التغييرات.\n"); >> EnableTLS.c
-        echo     printf("\nاضغط على أي مفتاح للخروج..."); >> EnableTLS.c
-        echo     getchar(); >> EnableTLS.c
-        echo     return 0; >> EnableTLS.c
-        echo } >> EnableTLS.c
-      shell: cmd
-
-    - name: Compile with MinGW
-      run: |
-        gcc EnableTLS.c -o EnableTLS.exe -ladvapi32
+        gcc tools/EnableTLS/EnableTLS.c -o EnableTLS.exe -ladvapi32
       shell: cmd
 
     - name: Upload Executable
