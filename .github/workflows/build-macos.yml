@@ -1,0 +1,54 @@
+name: Build macOS App (Qt 5.15.2)
+
+on:
+  workflow_dispatch:   # تشغيل يدوي فق
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v4
+
+    - name: Install Qt 5.15.2
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '5.15.2'
+        host: 'mac'
+        target: 'desktop'
+        arch: 'clang_64'
+        cache: true
+
+    - name: Install Dependencies (macOS)
+      run: |
+        brew install cmake
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_PREFIX_PATH=${{ env.Qt5_DIR }}/lib/cmake \
+              ..
+
+    - name: Build
+      run: |
+        cd build
+        make -j$(sysctl -n hw.ncpu)
+
+    - name: Deploy Qt Dependencies (macdeployqt)
+      run: |
+        cd build
+        macdeployqt RSSReader.app -dmg
+
+    - name: Rename DMG
+      run: |
+        cd build
+        mv RSSReader.dmg RSSReader-1.1.0-app.dmg
+
+    - name: Upload DMG
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-dmg
+        path: build/RSSReader-1.1.0-app.dmg
