@@ -80,7 +80,7 @@ Professional features will come later.
 
 | Platform | File | Link |
 | :--- | :--- | :--- |
-| **Linux (.deb)** | `rssreader-1.0.0-Linux.deb` | [Download](https://github.com/samermerhj/RSSReader/releases/latest) |
+| **Linux (.deb)** | `rssreader-1.1.0-Linux.deb` | [Download](https://github.com/samermerhj/RSSReader/releases/latest) |
 | **Linux (AppImage)** | `RSSReader-x86_64.AppImage` | [Download](https://github.com/samermerhj/RSSReader/releases/latest) |
 | **Windows (.zip)** | `windows-deployed.zip` | [Download](https://github.com/samermerhj/RSSReader/releases/latest) |
 
