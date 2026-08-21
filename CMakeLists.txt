@@ -8,6 +8,8 @@ set(CMAKE_AUTOMOC ON)
 # إخفاء نافذة الطرفية على ويندوز
 if (WIN32)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
+    set(RESOURCES ${CMAKE_SOURCE_DIR}/resources/app.ico)
+    add_executable(rssreader WIN32 ${SOURCES} ${RESOURCES})
 endif()
 
 find_package(Qt5 REQUIRED COMPONENTS
