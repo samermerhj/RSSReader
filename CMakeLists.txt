@@ -5,13 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
-# إخفاء نافذة الطرفية على ويندوز
-if (WIN32)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
-    set(RESOURCES ${CMAKE_SOURCE_DIR}/resources/app.ico)
-    add_executable(rssreader WIN32 ${SOURCES} ${RESOURCES})
-endif()
-
 find_package(Qt5 REQUIRED COMPONENTS
     Widgets Network Sql Xml Svg
 )
@@ -30,7 +23,17 @@ set(SOURCES
     src/ResourceManager.cpp
 )
 
-add_executable(rssreader ${SOURCES})
+# ------------------ تعريف الهدف (مرة واحدة فقط) ------------------
+if (WIN32)
+    # إخفاء نافذة الطرفية على ويندوز
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
+    # إضافة الأيقونة
+    list(APPEND SOURCES ${CMAKE_SOURCE_DIR}/resources/app.ico)
+    add_executable(rssreader WIN32 ${SOURCES})
+else()
+    add_executable(rssreader ${SOURCES})
+endif()
+# ------------------ نهاية التعريف ------------------
 
 # نسخ resources و translations إلى مجلد البناء (للتطوير)
 add_custom_command(TARGET rssreader POST_BUILD
