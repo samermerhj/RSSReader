@@ -11,9 +11,33 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtCore/QRegularExpression>
 #include <QtCore/QThread>
+#include <QtCore/QFile>
+#include <QtCore/QTextStream>
+#include <QtCore/QDateTime>
+#include <QSslSocket>
+#include <QSslConfiguration>
 
 // ============================================================
-// 1. فئة معالجة الطلب (تعمل في خيط منفصل)
+// 1. دالة تسجيل الأحداث (Logging)
+// ============================================================
+void logMessage(const QString &msg) {
+    QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    QString logLine = QString("[%1] %2").arg(timestamp).arg(msg);
+
+    // طباعة في CMD
+    qDebug().noquote() << logLine;
+
+    // كتابة في ملف السجل
+    QFile logFile("proxy.log");
+    if (logFile.open(QIODevice::Append | QIODevice::Text)) {
+        QTextStream out(&logFile);
+        out << logLine << "\n";
+        logFile.close();
+    }
+}
+
+// ============================================================
+// 2. فئة معالجة الطلب (محسّنة)
 // ============================================================
 class ProxyTask : public QObject, public QRunnable {
     Q_OBJECT
@@ -23,61 +47,72 @@ public:
 
     void run() override {
         QTcpSocket clientSocket;
+
+        // قبول الاتصال
         if (!clientSocket.setSocketDescriptor(m_socketDescriptor)) {
-            qWarning() << "❌ فشل في قبول الاتصال";
+            logMessage("❌ فشل في قبول الاتصال من العميل");
             return;
         }
 
+        logMessage("📥 اتصال جديد من " + clientSocket.peerAddress().toString());
+
+        // انتظار الطلب
         if (!clientSocket.waitForReadyRead(5000)) {
-            qWarning() << "⚠️ انتهت المهلة أثناء انتظار الطلب";
+            logMessage("⚠️ انتهت المهلة أثناء انتظار الطلب (5 ثوانٍ)");
             return;
         }
 
         QByteArray requestData = clientSocket.readAll();
         if (requestData.isEmpty()) {
-            qWarning() << "⚠️ طلب فارغ";
+            logMessage("⚠️ طلب فارغ من العميل");
             return;
         }
 
+        // تحليل الطلب
         QString requestStr = QString::fromUtf8(requestData);
         QStringList lines = requestStr.split("\r\n");
         if (lines.isEmpty()) {
-            qWarning() << "⚠️ طلب غير صحيح";
+            logMessage("⚠️ طلب غير صحيح (بدون سطور)");
             return;
         }
 
         QString firstLine = lines.first();
-        qDebug() << "📨 الطلب:" << firstLine;
+        logMessage("📨 الطلب: " + firstLine);
 
+        // استخراج الـ URL
         QRegularExpression regex("^(GET|POST|HEAD|CONNECT)\\s+(https?://[^\\s]+)");
         QRegularExpressionMatch match = regex.match(firstLine);
 
         if (!match.hasMatch()) {
-            qWarning() << "⚠️ لم يتم العثور على URL في الطلب";
+            logMessage("⚠️ لم يتم العثور على URL في الطلب");
             return;
         }
 
         QString method = match.captured(1);
         QString fullUrl = match.captured(2);
 
-        // معالجة CONNECT (ليس مطلوباً في هذا الوكيل البسيط)
+        // معالجة CONNECT (HTTPS عبر البروكسي)
         if (method == "CONNECT") {
-            qWarning() << "⚠️ CONNECT غير مدعوم في هذا الوكيل";
+            logMessage("🔒 طلب CONNECT لـ " + fullUrl + " (غير مدعوم)");
             clientSocket.write("HTTP/1.1 501 Not Implemented\r\n\r\n");
             clientSocket.disconnectFromHost();
             return;
         }
 
+        // تحليل URL
         QUrl url(fullUrl);
         if (!url.isValid()) {
-            qWarning() << "⚠️ URL غير صحيح:" << fullUrl;
+            logMessage("⚠️ URL غير صحيح: " + fullUrl);
             return;
         }
 
-        QNetworkRequest request(url);
-        request.setRawHeader("User-Agent", "RSSProxy/1.0");
+        logMessage("🌐 جاري جلب: " + url.toString());
 
-        // إضافة الـ headers من الطلب الأصلي
+        // إعداد الطلب
+        QNetworkRequest request(url);
+        request.setRawHeader("User-Agent", "RSSProxy/2.0 (Windows 7)");
+
+        // إضافة الـ Headers من الطلب الأصلي
         for (int i = 1; i < lines.size(); ++i) {
             QString line = lines[i];
             if (!line.isEmpty() && !line.startsWith("Proxy-", Qt::CaseInsensitive)) {
@@ -90,11 +125,28 @@ public:
             }
         }
 
-        // إرسال الطلب عبر HTTPS
-        QNetworkReply *reply = m_nam->get(request);
-        connect(reply, &QNetworkReply::finished, [this, &clientSocket, reply]() {
-            QByteArray responseData = reply->readAll();
+        // إعدادات SSL: إجبار استخدام TLS 1.2
+        QSslConfiguration sslConfig = QSslConfiguration::defaultConfiguration();
+        sslConfig.setProtocol(QSsl::TlsV1_2);
+        request.setSslConfiguration(sslConfig);
 
+        // إرسال الطلب
+        QNetworkReply *reply = m_nam->get(request);
+
+        // معالجة الاستجابة
+        connect(reply, &QNetworkReply::finished, [this, &clientSocket, reply]() {
+            if (reply->error() != QNetworkReply::NoError) {
+                logMessage("❌ خطأ في جلب البيانات: " + reply->errorString());
+                clientSocket.write("HTTP/1.1 502 Bad Gateway\r\n\r\n");
+                clientSocket.disconnectFromHost();
+                reply->deleteLater();
+                return;
+            }
+
+            QByteArray responseData = reply->readAll();
+            logMessage("✅ تم جلب " + QString::number(responseData.size()) + " بايت بنجاح");
+
+            // بناء استجابة HTTP
             QString response = "HTTP/1.1 200 OK\r\n";
             response += "Content-Type: text/xml; charset=utf-8\r\n";
             response += "Content-Length: " + QString::number(responseData.size()) + "\r\n";
@@ -105,7 +157,6 @@ public:
             clientSocket.flush();
             clientSocket.disconnectFromHost();
 
-            qDebug() << "✅ تم إرجاع" << responseData.size() << "بايت";
             reply->deleteLater();
         });
     }
@@ -116,26 +167,43 @@ private:
 };
 
 // ============================================================
-// 2. الدالة الرئيسية
+// 3. الدالة الرئيسية
 // ============================================================
 int main(int argc, char *argv[]) {
     QCoreApplication app(argc, argv);
 
-    // إجبار Qt على استخدام Schannel بدلاً من OpenSSL
+    // إعدادات التطبيق
+    QCoreApplication::setApplicationName("RSSProxy");
+    QCoreApplication::setOrganizationName("RSSReader");
+
+    logMessage("🚀 بدء تشغيل وكيل RSSProxy v2.0");
+
+    // إعداد SSL: استخدام Schannel (يمكن تغييره إلى OpenSSL)
     qputenv("QT_SSL_USE_OPENSSL", "0");
+    logMessage("🔐 استخدام Schannel (SSL مدمج في ويندوز)");
+
+    // إجبار TLS 1.2
+    QSslConfiguration sslConfig = QSslConfiguration::defaultConfiguration();
+    sslConfig.setProtocol(QSsl::TlsV1_2);
+    QSslConfiguration::setDefaultConfiguration(sslConfig);
+    logMessage("🔐 تم إجبار TLS 1.2");
 
     QNetworkAccessManager nam;
     QThreadPool threadPool;
 
+    // بدء الخادم
     QTcpServer server;
-    if (!server.listen(QHostAddress::Any, 8080)) {
-        qCritical() << "❌ فشل في بدء الخادم على المنفذ 8080";
+    int port = 8080;
+    if (!server.listen(QHostAddress::Any, port)) {
+        logMessage("❌ فشل في بدء الخادم على المنفذ " + QString::number(port));
         return 1;
     }
 
-    qDebug() << "✅ وكيل HTTP/HTTPS يعمل على المنفذ 8080";
-    qDebug() << "📌 استخدم عناوين مثل: http://127.0.0.1:8080/https://example.com/rss.xml";
+    logMessage("✅ وكيل HTTP/HTTPS يعمل على المنفذ " + QString::number(port));
+    logMessage("📌 استخدم عناوين مثل: http://127.0.0.1:8080/https://example.com/rss.xml");
+    logMessage("📄 سجل الأحداث في: proxy.log");
 
+    // ربط إشارة الاتصال الجديد
     QObject::connect(&server, &QTcpServer::newConnection, [&]() {
         QTcpSocket *clientSocket = server.nextPendingConnection();
         if (!clientSocket) return;
@@ -148,7 +216,8 @@ int main(int argc, char *argv[]) {
         threadPool.start(task);
     });
 
-    qDebug() << "🔄 جاهز لاستقبال الطلبات...";
+    logMessage("🔄 جاهز لاستقبال الطلبات...");
+
     return app.exec();
 }
 
