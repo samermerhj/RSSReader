@@ -76,12 +76,10 @@ Professional features will come later.
 
 **Version:** `1.1.0`
 
-### Free Version (Open Source)
-
 | Platform | File | Link |
 | :--- | :--- | :--- |
-| **Linux (.deb)** | `rssreader-1.1.0-Linux.deb` | [Download](https://github.com/samermerhj/RSSReader/releases/latest/download/rssreader-1.1.0-Linux.deb) |
-| **Windows (Installer)** | `RSSReader_Setup.exe` | [Download](https://github.com/samermerhj/RSSReader/releases/latest/download/RSSReader_Setup.exe) |
+| **Linux (.deb)** | `rssreader-1.1.0-Linux.deb` | [Download](https://github.com/samermerhj/RSSReader/releases/download/deb-v1.1.0/rssreader-1.1.0-Linux.deb) |
+| **Windows (Installer)** | `RSSReader_Setup.exe` | [Download](https://github.com/samermerhj/RSSReader/releases/download/v1.1.0-windows/RSSReader_Setup.exe) |
 
 
 ---
