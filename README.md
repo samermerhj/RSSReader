@@ -80,10 +80,15 @@ Professional features will come later.
 
 | Platform | File | Link |
 | :--- | :--- | :--- |
-| **Linux (.deb)** | `rssreader-1.1.0-Linux.deb` | [Download](https://github.com/samermerhj/RSSReader/releases/latest) |
-| **mac os (dmg)** | `RSSReader-1.1.0-app.dmg` | [Download](https://github.com/samermerhj/RSSReader/releases/latest) |
-| **Windows (.zip)** | `windows-deployed.zip` | [Download](https://github.com/samermerhj/RSSReader/releases/latest) |
+| **Linux (.deb)** | `rssreader-1.1.0-Linux.deb` | [Download](https://github.com/samermerhj/RSSReader/releases/latest/download/rssreader-1.1.0-Linux.deb) |
+| **Windows (Installer)** | `RSSReader_Setup.exe` | [Download](https://github.com/samermerhj/RSSReader/releases/latest/download/RSSReader_Setup.exe) |
 
+
+---
+
+### 📦 All Releases
+
+If you prefer to browse all available files, visit the [Releases Page](https://github.com/samermerhj/RSSReader/releases).
 ---
 ## 🔧 Windows Requirements
 
