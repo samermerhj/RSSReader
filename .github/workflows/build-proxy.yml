@@ -5,29 +5,30 @@ on:
 
 jobs:
   build-proxy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest   # استخدام خادم ويندوز
 
     steps:
     - name: Checkout source code
       uses: actions/checkout@v4
 
-    - name: Install Qt5 and MinGW (cross-compile)
-      run: |
-        sudo apt update
-        sudo apt install -y qt5-qmake qtbase5-dev g++-mingw-w64-x86-64-posix
+    - name: Install Qt for Windows
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '5.15.2'
+        host: 'windows'
+        target: 'desktop'
+        arch: 'win64_mingw81'
+        cache: true
 
-    - name: Copy proxy source files
+    - name: Build proxy.exe
       run: |
-        cp tools/rssproxy/proxy.cpp .
-        cp tools/rssproxy/proxy.pro .
-
-    - name: Build proxy.exe (cross-compile)
-      run: |
-        x86_64-w64-mingw32-qmake-qt5 proxy.pro
-        make
+        cd tools\rssproxy
+        qmake proxy.pro
+        mingw32-make
+      shell: cmd
 
     - name: Upload Windows Executable
       uses: actions/upload-artifact@v4
       with:
         name: rssproxy-win
-        path: release/rssproxy.exe
+        path: tools\rssproxy\release\rssproxy.exe
