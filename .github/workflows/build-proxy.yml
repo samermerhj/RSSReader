@@ -1,0 +1,33 @@
+name: Build RSSProxy (Windows)
+
+on:
+  workflow_dispatch:   # تشغيل يدوي فقط
+
+jobs:
+  build-proxy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v4
+
+    - name: Install Qt5 and MinGW (cross-compile)
+      run: |
+        sudo apt update
+        sudo apt install -y qt5-qmake qtbase5-dev g++-mingw-w64-x86-64-posix
+
+    - name: Copy proxy source files
+      run: |
+        cp tools/rssproxy/proxy.cpp .
+        cp tools/rssproxy/proxy.pro .
+
+    - name: Build proxy.exe (cross-compile)
+      run: |
+        x86_64-w64-mingw32-qmake-qt5 proxy.pro
+        make
+
+    - name: Upload Windows Executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: rssproxy-win
+        path: release/rssproxy.exe
