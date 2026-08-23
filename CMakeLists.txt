@@ -67,17 +67,8 @@ if (UNIX AND NOT APPLE)
     install(FILES rssreader.desktop DESTINATION share/applications)
     install(FILES LICENSE DESTINATION share/doc/RSSReader)
 
-    # إنشاء مجلد rsss في منزل المستخدم (لينكس فقط)
-    install(CODE "
-        execute_process(COMMAND whoami OUTPUT_VARIABLE USERNAME OUTPUT_STRIP_TRAILING_WHITESPACE)
-        set(RSSS_DIR \"/home/\${USERNAME}/rsss\")
-        file(MAKE_DIRECTORY \${RSSS_DIR}/resources/images/news_icons)
-        file(MAKE_DIRECTORY \${RSSS_DIR}/resources/images/backgrounds)
-        file(MAKE_DIRECTORY \${RSSS_DIR}/translations)
-        file(MAKE_DIRECTORY \${RSSS_DIR}/cache/images)
-        file(COPY ${CMAKE_SOURCE_DIR}/resources/ DESTINATION \${RSSS_DIR}/resources/)
-        file(COPY ${CMAKE_SOURCE_DIR}/translations/ DESTINATION \${RSSS_DIR}/translations/)
-    ")
+    # ملاحظة: تم حذف كتلة install(CODE ...) القديمة لأنها لا تعمل على أجهزة المستخدمين
+    # وتم استبدالها بسكربت postinst (انظر قسم CPack أدناه)
 endif()
 
 # ---------- إعدادات CPack (لحزمة .deb) ----------
@@ -93,5 +84,13 @@ if (UNIX AND NOT APPLE)
     set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
     set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
     set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/samermerhj/RSSReader")
+
+    # 🆕 تضمين سكربتات التحكم (postinst / postrm) في الحزمة
+    # تأكد من وجود الملفات في مجلد cmake/debian/ داخل مشروعك
+    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA
+        "${CMAKE_SOURCE_DIR}/cmake/debian/postinst"
+        "${CMAKE_SOURCE_DIR}/cmake/debian/postrm"
+    )
+
     include(CPack)
 endif()

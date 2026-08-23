@@ -4,6 +4,9 @@
 #include <QRegularExpression>
 #include <QDebug>
 #include <QNetworkReply>
+#include <QSslConfiguration>
+#include <QSslSocket>
+
 /**
  * Copyright (C) 2026 Samer Merhj <mjosak7@gmail.com>
  *
@@ -20,6 +23,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 RSSFetcher::RSSFetcher(DatabaseManager *dbManager, QObject *parent)
     : QObject(parent)
     , dbManager(dbManager)
@@ -36,6 +40,17 @@ void RSSFetcher::fetchFeed(const QString &url, const QString &sourceName)
     QNetworkRequest request;
     request.setUrl(QUrl(url));
     request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+
+    // ---------- إصلاحات HTTPS ----------
+    // 1. تفعيل اتباع إعادة التوجيه (Redirects)
+    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+
+    // 2. فرض استخدام TLS 1.2 أو أحدث (مهم جداً لويندوز 7)
+    QSslConfiguration sslConfig = QSslConfiguration::defaultConfiguration();
+    sslConfig.setProtocol(QSsl::TlsV1_2OrLater);
+    request.setSslConfiguration(sslConfig);
+    // -----------------------------------
+
     QNetworkReply *reply = networkManager->get(request);
     reply->setProperty("sourceName", sourceName);
     reply->setProperty("sourceUrl", url);

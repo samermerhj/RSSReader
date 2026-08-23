@@ -1,9 +1,51 @@
 #!/bin/sh
-set -e
-if command -v update-icon-caches >/dev/null 2>&1; then
-    update-icon-caches /usr/share/icons/hicolor || true
-fi
-if command -v update-desktop-database >/dev/null 2>&1; then
-    update-desktop-database /usr/share/applications || true
-fi
-exit 0
+   set -e
+   
+   # ---------- تحديث الأيقونات وقاعدة البيانات ----------
+   if command -v update-icon-caches >/dev/null 2>&1; then
+       update-icon-caches /usr/share/icons/hicolor || true
+   fi
+   if command -v update-desktop-database >/dev/null 2>&1; then
+       update-desktop-database /usr/share/applications || true
+   fi
+   
+   # ---------- إنشاء مجلد rsss في مجلد المستخدم ونسخ الموارد ----------
+   # 1. تحديد المستخدم الحقيقي الذي قام بالتثبيت (عادةً عبر sudo)
+   if [ -n "$SUDO_USER" ]; then
+       REAL_USER="$SUDO_USER"
+   elif [ -n "$USER" ] && [ "$USER" != "root" ]; then
+       REAL_USER="$USER"
+   else
+       REAL_USER=$(who | awk '{print $1}' | head -n1)
+   fi
+   
+   # إذا لم نستطع تحديد مستخدم عادي، نتوقف بدون أخطاء
+   if [ -z "$REAL_USER" ] || [ "$REAL_USER" = "root" ]; then
+       echo "⚠️ لا يمكن تحديد مستخدم عادي، تخطي إنشاء مجلد rsss."
+       exit 0
+   fi
+   
+   # 2. تحديد مجلد المنزل للمستخدم
+   USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
+   if [ -z "$USER_HOME" ]; then
+       echo "⚠️ مجلد منزل المستخدم غير موجود."
+       exit 0
+   fi
+   
+   # 3. إنشاء المجلدات المطلوبة
+   RSSS_DIR="$USER_HOME/rsss"
+   mkdir -p "$RSSS_DIR/resources/images/news_icons"
+   mkdir -p "$RSSS_DIR/resources/images/backgrounds"
+   mkdir -p "$RSSS_DIR/translations"
+   mkdir -p "$RSSS_DIR/cache/images"
+   
+   # 4. نسخ الموارد والترجمات من مكان التثبيت إلى مجلد المستخدم
+   cp -R /usr/share/RSSReader/resources/* "$RSSS_DIR/resources/"
+   cp -R /usr/share/RSSReader/translations/* "$RSSS_DIR/translations/"
+   
+   # 5. ضبط الملكية لتكون للمستخدم وليس root
+   chown -R "$REAL_USER":"$REAL_USER" "$RSSS_DIR"
+   
+   echo "✅ تم إنشاء مجلد rsss ونسخ الموارد إلى $RSSS_DIR"
+   
+   exit 0

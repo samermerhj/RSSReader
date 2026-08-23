@@ -6,6 +6,8 @@
 #include <QLibraryInfo>
 #include <QSettings>
 #include <QMessageBox>
+#include <QSslSocket>
+#include <QSslConfiguration>
 #include "MainWindow.h"
 #include "ResourceManager.h"
 
@@ -26,9 +28,41 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// ===== دالة فحص دعم SSL =====
+void checkSslSupport()
+{
+    if (!QSslSocket::supportsSsl()) {
+        QMessageBox::critical(nullptr, "خطأ في SSL",
+            "OpenSSL غير متوفر! لا يمكن استخدام اتصالات HTTPS.\n"
+            "يرجى تثبيت مكتبات OpenSSL أو تحديث النظام.");
+        return;
+    }
+
+    QString buildVersion = QSslSocket::sslLibraryBuildVersionString();
+    QString runtimeVersion = QSslSocket::sslLibraryVersionString();
+
+    qDebug() << "✅ OpenSSL متوفر:";
+    qDebug() << "   الإصدار المبني معه:" << buildVersion;
+    qDebug() << "   الإصدار في وقت التشغيل:" << runtimeVersion;
+
+    // تحقق من دعم TLS 1.2
+    QSslConfiguration sslConfig = QSslConfiguration::defaultConfiguration();
+    QSsl::SslProtocol protocol = sslConfig.protocol();
+
+    if (protocol >= QSsl::TlsV1_2) {
+        qDebug() << "   البروتوكول الافتراضي يدعم TLS 1.2 أو أعلى.";
+    } else {
+        qDebug() << "⚠️ البروتوكول الافتراضي:" << protocol;
+        qDebug() << "   قد تحتاج لفرض TLS 1.2 يدويًا في الطلبات.";
+    }
+}
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+    // ---------- فحص دعم SSL ----------
+    checkSslSupport();
 
     // ---------- 1. إعدادات التطبيق ----------
     QCoreApplication::setApplicationName("RSSReader");
