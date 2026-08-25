@@ -80,6 +80,7 @@ Professional features will come later.
 | :--- | :--- | :--- |
 | **Linux (.deb)** | `rssreader-1.1.0-Linux.deb` | [Download](https://github.com/samermerhj/RSSReader/releases/download/deb-v1.1.0/rssreader-1.1.0-Linux.deb) |
 | **Windows (Installer)** | `RSSReader_Setup.exe` | [Download](https://github.com/samermerhj/RSSReader/releases/download/v1.1.0-windows/RSSReader_Setup.exe) |
+| **Windows 7 (with OpenSSL)** | `RSSReader_Win7_Setup.exe` | [Download](https://github.com/samermerhj/RSSReader/releases/download/v1.1.0-windows/RSSReader_Win7_Setup.exe) |
 
 
 ---
